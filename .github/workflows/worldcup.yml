@@ -19,6 +19,6 @@ jobs:
         run: pip install openai requests
       - name: Run push script
         env:
-          SF_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        SF_API_KEY: ${{ secrets.SF_API_KEY }}
           SERVER_CHAN_KEY: ${{ secrets.SERVER_CHAN_KEY }}
         run: python push.py
