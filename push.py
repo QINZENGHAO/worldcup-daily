@@ -11,69 +11,96 @@ now = datetime.now(tz)
 hour = now.hour
 date_str = now.strftime("%Y年%m月%d日")
 
-# 拉取实时世界杯数据
-def get_wc_data():
-    try:
-        resp = requests.get(
-            "https://api.sofascore.com/api/v1/sport/football/scheduled-events/"
-            + now.strftime("%Y-%m-%d"),
-            headers={"User-Agent": "Mozilla/5.0"},
-            timeout=10
-        )
-        events = resp.json().get("events", [])
-        wc = [e for e in events if "World Cup" in e.get("tournament", {}).get("name", "")]
-        lines = []
-        for e in wc:
-            home = e["homeTeam"]["name"]
-            away = e["awayTeam"]["name"]
-            status = e.get("status", {}).get("type", "")
-            if status == "finished":
-                hs = e["homeScore"]["current"]
-                as_ = e["awayScore"]["current"]
-                lines.append(f"{home} {hs}–{as_} {away} [已结束]")
-            else:
-                t = e.get("startTimestamp", 0)
-                gt = datetime.fromtimestamp(t, tz).strftime("%H:%M")
-                lines.append(f"{home} vs {away} [{gt}开踢]")
-        return "\n".join(lines) if lines else "暂无世界杯赛事数据"
-    except:
-        return "数据获取失败，请根据实际情况分析"
-
-games_info = get_wc_data()
-
 client = OpenAI(
     api_key=SF_API_KEY,
     base_url="https://api.siliconflow.cn/v1"
 )
 
+def get_wc_games(date_str_api):
+    """从thesportsdb拉取世界杯赛事"""
+    try:
+        url = f"https://www.thesportsdb.com/api/v1/json/3/eventsday.php?d={date_str_api}&s=Soccer"
+        resp = requests.get(url, timeout=10)
+        data = resp.json()
+        events = data.get("events") or []
+        
+        wc_keywords = ["World Cup", "FIFA World Cup", "2026"]
+        wc_games = []
+        
+        for e in events:
+            league = e.get("strLeague", "")
+            if any(k in league for k in wc_keywords):
+                home = e.get("strHomeTeam", "")
+                away = e.get("strAwayTeam", "")
+                home_score = e.get("intHomeScore")
+                away_score = e.get("intAwayScore")
+                status = e.get("strStatus", "")
+                time_str = e.get("strTime", "")
+                
+                if home_score is not None and away_score is not None:
+                    wc_games.append(f"✅ {home} {home_score}–{away_score} {away} [已结束]")
+                else:
+                    # 转换时间到北京时间
+                    try:
+                        t = datetime.strptime(
+                            e.get("dateEvent","") + " " + time_str,
+                            "%Y-%m-%d %H:%M:%S"
+                        ).replace(tzinfo=timezone.utc)
+                        bj = t.astimezone(tz).strftime("%H:%M")
+                    except:
+                        bj = time_str
+                    wc_games.append(f"🔜 {home} vs {away} [北京{bj}]")
+        
+        return wc_games
+    except Exception as ex:
+        return [f"数据获取失败: {ex}"]
+
+# 拉取今天和明天的赛事
+today_api = now.strftime("%Y-%m-%d")
+tomorrow = now + timedelta(days=1)
+tomorrow_api = tomorrow.strftime("%Y-%m-%d")
+
+today_games = get_wc_games(today_api)
+tomorrow_games = get_wc_games(tomorrow_api)
+
+today_text = "\n".join(today_games) if today_games else "今日无世界杯赛事"
+tomorrow_text = "\n".join(tomorrow_games) if tomorrow_games else "明日无世界杯赛事"
+
 if hour >= 16:
     task = "预测"
     prompt = f"""你是专业世界杯分析师，今天是{date_str}。
 
-以下是今明两日的真实世界杯赛事数据：
-{games_info}
+【今日赛事】
+{today_text}
 
-请严格基于以上真实赛事数据，给出明日赛事预测：
-1. 按信心指数从高到低排列
-2. 每场包含：开场/半场/全场比分推演
-3. 冷门分析（用★标注冷门指数）
-4. 结尾信心总览表格
+【明日赛事】
+{tomorrow_text}
 
-⚠️ 只分析上面列出的真实比赛，不要编造比赛。格式简洁适合微信阅读。"""
+请基于以上真实数据，对明日赛事按信心指数从高到低给出预测：
+1. 每场给出开场/半场/全场比分推演
+2. 冷门分析用★☆标注（★越多风险越高）
+3. 结尾给出信心总览表格
+
+⚠️ 只分析上面列出的真实比赛，不要编造任何比赛或比分。
+格式简洁，适合微信阅读，多用emoji。"""
+
 else:
     task = "复盘"
     prompt = f"""你是专业世界杯分析师，今天是{date_str}。
 
-以下是今日真实世界杯赛事数据：
-{games_info}
+【今日赛事结果】
+{today_text}
 
-请严格基于以上真实数据：
-1. 列出所有已结束比赛的真实结果
-2. 逐场标注 ✅命中 / ❌偏差 / ⚡冷门
-3. 统计命中率
-4. 若有未开始的比赛，给出预测
+【明日赛事预告】
+{tomorrow_text}
 
-⚠️ 只分析上面列出的真实比赛，不要编造数据。格式简洁适合微信阅读。"""
+请完成：
+1. 逐场复盘今日已结束比赛，标注 ✅命中 / ❌偏差 / ⚡冷门
+2. 统计整体命中率
+3. 对明日赛事给出简要预测
+
+⚠️ 只分析上面列出的真实比赛，不要编造数据。
+格式简洁，适合微信阅读，多用emoji。"""
 
 response = client.chat.completions.create(
     model="Qwen/Qwen2.5-7B-Instruct",
@@ -89,6 +116,7 @@ resp = requests.post(
     data={"title": title, "desp": content}
 )
 
+print(f"今日赛事:\n{today_text}")
+print(f"明日赛事:\n{tomorrow_text}")
 print(f"推送状态: {resp.status_code}")
-print(f"赛事数据:\n{games_info}")
 print(f"内容预览:\n{content[:300]}")
