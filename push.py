@@ -47,29 +47,25 @@ if hour >= 16:
     games_text = f"以下是今明两日真实世界杯赛事数据：\n{games}" if games else ""
     prompt = f"""你是专业世界杯分析师，今天是{date_str}。
 {games_text}
-
 请给出明日所有世界杯赛事的深度预测：
 1. 按信心指数从高到低排列
 2. 每场包含：开场/半场/全场比分推演、关键球员、战术分析
 3. 冷门分析用★标注冷门指数
 4. 结尾给出信心总览表格
-
 格式简洁适合微信阅读，多用emoji，内容要专业有深度。"""
 else:
     task = "复盘"
     games_text = f"以下是今日真实世界杯赛事数据：\n{games}" if games else ""
     prompt = f"""你是专业世界杯分析师，今天是{date_str}。
 {games_text}
-
 请完成：
 1. 逐场复盘今日比赛真实结果，标注✅命中/❌偏差/⚡冷门
 2. 统计命中率与规律总结
 3. 明日赛事简要预测
-
 格式简洁适合微信阅读，多用emoji。"""
 
 response = client.chat.completions.create(
-    model="anthropic/claude-sonnet-4-5",
+    model="meta-llama/llama-3.3-70b-instruct:free",
     messages=[{"role": "user", "content": prompt}],
     max_tokens=2000,
     extra_headers={
