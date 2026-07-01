@@ -8,81 +8,127 @@ SERVER_CHAN_KEY = os.environ["SERVER_CHAN_KEY"]
 
 tz = timezone(timedelta(hours=8))
 now = datetime.now(tz)
-hour = now.hour
-date_str = now.strftime("%Y年%m月%d日")
+date_str = now.strftime("%Y年%m月%d日 %H:%M")
+today_date = now.strftime("%Y-%m-%d")
+tomorrow_date = (now + timedelta(days=1)).strftime("%Y-%m-%d")
 
 client = OpenAI(
     api_key=SF_API_KEY,
     base_url="https://api.siliconflow.cn/v1"
 )
 
-def get_wc_games():
+def get_games(date):
     try:
-        today = now.strftime("%Y-%m-%d")
-        tom = (now + timedelta(days=1)).strftime("%Y-%m-%d")
-        results = []
-        for d in [today, tom]:
-            url = f"https://www.thesportsdb.com/api/v1/json/3/eventsday.php?d={d}&s=Soccer"
-            r = requests.get(url, timeout=10).json()
-            for e in (r.get("events") or []):
-                league = e.get("strLeague", "")
-                if "World Cup" in league or "FIFA" in league:
-                    home = e.get("strHomeTeam", "")
-                    away = e.get("strAwayTeam", "")
-                    hs = e.get("intHomeScore")
-                    as_ = e.get("intAwayScore")
-                    if hs is not None and as_ is not None:
-                        results.append(f"[{d}] {home} {hs}–{as_} {away} 已结束")
-                    else:
-                        t = e.get("strTime", "")
-                        results.append(f"[{d}] {home} vs {away} {t}开踢")
-        return "\n".join(results) if results else None
-    except Exception as ex:
-        return None
+        url = f"https://www.thesportsdb.com/api/v1/json/3/eventsday.php?d={date}&s=Soccer"
+        r = requests.get(url, timeout=10).json()
+        out = []
+        for e in (r.get("events") or []):
+            league = e.get("strLeague", "")
+            if "World Cup" in league or "FIFA" in league:
+                home = e.get("strHomeTeam", "")
+                away = e.get("strAwayTeam", "")
+                hs = e.get("intHomeScore")
+                as_ = e.get("intAwayScore")
+                t = e.get("strTime", "")
+                if hs is not None and as_ is not None:
+                    out.append(f"{home} {hs}-{as_} {away} [已结束]")
+                else:
+                    out.append(f"{home} vs {away} [{t}开踢]")
+        return out
+    except:
+        return []
 
-games = get_wc_games()
+today_games = get_games(today_date)
+tomorrow_games = get_games(tomorrow_date)
+today_text = "\n".join(today_games) if today_games else "暂无赛事数据"
+tomorrow_text = "\n".join(tomorrow_games) if tomorrow_games else "暂无赛事数据"
 
-if hour >= 16:
-    task = "预测"
-    games_text = f"今明两日真实世界杯赛事：\n{games}\n" if games else "（今日暂无赛事数据）\n"
-    prompt = f"""你是专业世界杯分析师，今天是{date_str}。
+prompt = f"""你是专业世界杯分析师，现在是北京时间 {date_str}。
 
-{games_text}
-请严格基于以上真实赛事，给出明日预测：
-1. 按信心指数从高到低排列
-2. 每场给出开场/半场/全场比分推演
-3. 冷门分析标注冷门指数
-4. 结尾给出信心总览表格
+今日赛事数据：
+{today_text}
 
-只分析以上列出的真实比赛，不要编造比赛。格式简洁适合微信阅读。"""
+明日赛事数据：
+{tomorrow_text}
 
-else:
-    task = "复盘"
-    games_text = f"今日真实世界杯赛事：\n{games}\n" if games else "（今日暂无赛事数据）\n"
-    prompt = f"""你是专业世界杯分析师，今天是{date_str}。
+请生成一个完整的单页HTML世界杯数据看盘，要求：
 
-{games_text}
-请完成：
-1. 逐场复盘今日已结束比赛，标注命中/偏差/冷门
-2. 统计命中率
-3. 明日赛事简要预测
+【内容要求】
+1. 页面顶部显示标题「2026世界杯数据看盘」和更新时间
+2. 今日所有赛事卡片，每张卡片包含：
+   - 比赛双方（带国旗emoji）和实时比分/倒计时
+   - 三方胜率概率条（主胜/平局/客胜，带百分比）
+   - 大小球分析（大2.5概率 vs 小2.5概率）
+   - 冷门指数（★☆标注，1-5星）
+   - 精推比分（最可能的3个比分）
+   - 战意/轮换简评（2行以内）
+3. 明日赛事预告（简版卡片）
+4. 近期命中率统计（象牙海岸1-2挪威✓，法国3-0瑞典✓，德国1-1巴拉圭⚡冷门，荷兰1-1摩洛哥✓，巴西2-1日本✓）
+5. 底部免责声明
 
-只分析以上列出的真实比赛，不要编造数据。格式简洁适合微信阅读。"""
+【设计要求】
+- 深色主题：背景 #0D0D0D，卡片 #141414，边框 #2A2A2A
+- 金色强调色：#D2AA5A
+- 成功绿：#2D9E5F，危险红：#E34948，警告橙：#eda100
+- 卡片圆角12px，间距16px
+- 胜率用彩色进度条（主队蓝#2a78d6，平局灰，客队金）
+- 冷门高危场次加红色边框警示
+- 完全响应式，手机和电脑都好看
+- 页面宽度最大800px居中
+
+【技术要求】
+- 纯HTML+CSS+JS，不引用任何外部库
+- 所有样式写在<style>标签内
+- 页面底部JS显示实时北京时间时钟
+- 无需任何外部字体或图标库
+
+只输出完整HTML，从<!DOCTYPE html>开始，不要任何解释文字。"""
 
 response = client.chat.completions.create(
-    model="Qwen/Qwen2.5-7B-Instruct",
+    model="Qwen/Qwen2.5-72B-Instruct",
     messages=[{"role": "user", "content": prompt}],
-    max_tokens=2000
+    max_tokens=4000
 )
 
-content = response.choices[0].message.content
-title = f"⚽ 世界杯{task} · {now.strftime('%m/%d %H:%M')}"
+html = response.choices[0].message.content
+for tag in ["```html", "```HTML", "```"]:
+    if tag in html:
+        parts = html.split(tag)
+        if len(parts) >= 3:
+            html = parts[1]
+        elif len(parts) == 2:
+            html = parts[1]
+        break
+
+html = html.strip()
+if not html.startswith("<!"):
+    idx = html.find("<!DOCTYPE")
+    if idx > 0:
+        html = html[idx:]
+
+os.makedirs("output", exist_ok=True)
+with open("output/index.html", "w", encoding="utf-8") as f:
+    f.write(html)
+
+print(f"看盘已生成，字符数：{len(html)}")
+print(f"今日赛事：{today_text}")
+
+title = f"⚽ 世界杯看盘更新 · {now.strftime('%m/%d %H:%M')}"
+desp = f"""看盘已自动更新！
+
+**今日赛事**
+{today_text}
+
+**明日赛事**
+{tomorrow_text}
+
+**查看完整看盘**
+https://QINZENGHAO.github.io/worldcup-daily/
+
+更新时间：{date_str} 北京时间"""
 
 resp = requests.post(
     f"https://sctapi.ftqq.com/{SERVER_CHAN_KEY}.send",
-    data={"title": title, "desp": content}
+    data={"title": title, "desp": desp}
 )
-
-print(f"游戏数据: {games}")
-print(f"推送状态: {resp.status_code}")
-print(f"内容预览:\n{content[:300]}")
+print(f"微信推送：{resp.status_code}")
