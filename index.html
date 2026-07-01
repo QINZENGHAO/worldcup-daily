@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026世界杯数据看盘</title>
+<style>
+  body {
+    background: #0D0D0D;
+    color: #FFFFFF;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    margin: 0;
+  }
+  .container {
+    max-width: 800px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 16px 0;
+  }
+  .header h1 {
+    font-size: 28px;
+  }
+  .header .time {
+    font-size: 18px;
+  }
+  .event-card {
+    background: #141414;
+    border-radius: 12px;
+    border: 1px solid #2A2A2A;
+    width: 100%;
+    max-width: 800px;
+    margin: 16px 0;
+    padding: 24px;
+    box-sizing: border-box;
+  }
+  .event-card.high-risk {
+    border: 2px solid #E34948;
+  }
+  .event-card p {
+    margin: 8px 0;
+  }
+  .event-card .match {
+    font-size: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+  .event-card .match .score {
+    font-size: 20px;
+  }
+  .event-card .progress {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 20px;
+    background: #2A2A2A;
+    border-radius: 12px;
+  }
+  .event-card .progress .bar {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    border-radius: 12px;
+  }
+  .event-card .progress .home {
+    background: #2a78d6;
+  }
+  .event-card .progress .draw {
+    background: #808080;
+  }
+  .event-card .progress .away {
+    background: #D2AA5A;
+  }
+  .event-card .odds {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+  .event-card .odds span {
+    padding: 8px 16px;
+    border-radius: 12px;
+  }
+  .event-card .odds .big {
+    background: #D2AA5A;
+  }
+  .event-card .odds .small {
+    background: #2a78d6;
+  }
+  .event-card .cold {
+    color: #D2AA5A;
+  }
+  .event-card .tips {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+  .event-card .tips span {
+    padding: 4px 8px;
+    border-radius: 8px;
+  }
+  .event-card .tips .success {
+    background: #2D9E5F;
+  }
+  .event-card .tips .warn {
+    background: #eda100;
+  }
+  .forecast {
+    font-size: 16px;
+    padding: 8px 0;
+  }
+  .forecast .result {
+    font-size: 14px;
+    color: #2D9E5F;
+  }
+  .forecast .miss {
+    font-size: 14px;
+    color: #E34948;
+  }
+  .forecast .cold {
+    font-size: 14px;
+    color: #eda100;
+  }
+  .disclaimer {
+    margin-top: 32px;
+    padding: 16px;
+    background: #141414;
+    border: 1px solid #2A2A2A;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 800px;
+    text-align: center;
+    font-size: 14px;
+  }
+  .no-data {
+    font-size: 20px;
+    margin: 32px 0;
+    color: #D2AA5A;
+  }
+  .clock {
+    font-size: 18px;
+    color: #D2AA5A;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>2026世界杯数据看盘</h1>
+    <div class="time"><span class="clock">14:47</span> 更新</div>
+  </div>
+  <div class="no-data">暂无今日赛事数据</div>
+  <div class="event-card high-risk">
+    <p class="match">orneysinameicon阿根堤ainesinameicon廷 <span class="score">VS</span> 英国🇬🇧 <span class="score">倒计时 00:00</span></p>
+    <div class="progress">
+      <div class="bar home">60%</div>
+      <div class="bar draw" style="width: 20%;">20%</div>
+      <div class="bar away">20%</div>
+    </div>
+    <div class="odds">
+      <span class="big">大2.5: 45%</span>
+      <span class="small">小2.5: 55%</span>
+    </div>
+    <p class="cold">冷门指数：★★★★☆</p>
+    <div class="forecast">
+      <p>精推比分：1-0, 2-1, 2-0</p>
+      <p>战意/轮换简评：阿根廷全力争胜</p>
+    </div>
+  </div>
+  <div class="event-card">
+    <p class="match">巴西🇧🇷 <span class="score">VS</span> 秘鲁🇵🇪 <span class="score">实时比分 1-1</span></p>
+    <div class="progress">
+      <div class="bar home" style="width: 70%;">70%</div>
+      <div class="bar draw" style="width: 15%;">15%</div>
+      <div class="bar away" style="width: 15%;">15%</div>
+    </div>
+    <div class="odds">
+      <span class="big">大2.5: 65%</span>
+      <span class="small">小2.5: 35%</span>
+    </div>
+    <p class="cold">冷门指数：★☆☆☆☆</p>
+    <div class="forecast">
+      <p>精推比分：2-1, 3-1, 2-0</p>
+      <p>战意/轮换简评：巴西轮换部分主力</p>
+    </div>
+  </div>
+  <div class="no-data">暂无明日赛事数据</div>
+  <div class="forecast">
+    <h3>近期命中率统计</h3>
+    <p>象牙海岸1-2挪威 ✓</p>
+    <p>法国3-0瑞典 ✓</p>
+    <p>德国1-1巴拉圭 ⚡冷门</p>
+    <p>荷兰1-1摩洛哥 ✓</p>
+    <p>巴西2-1日本 ✓</p>
+  </div>
+  <div class="disclaimer">
+    <p>免责声明：本数据看盘仅供参考，不作为投注依据，造成的任何损失我们不承担任何责任。</p>
+  </div>
+</div>
+<script>
+  function updateClock() {
+    const now = new Date();
+    const hours = now.getHours().toString().padStart(2, '0');
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    document.querySelector('.clock').textContent = `${hours}:${minutes}`;
+  }
+
+  setInterval(updateClock, 1000);
+  updateClock();
+</script>
+</body>
+</html>
+```
