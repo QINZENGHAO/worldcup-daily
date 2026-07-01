@@ -2,23 +2,38 @@ name: WorldCup Daily Push
 
 on:
   schedule:
-    - cron: '0 9 * * *'
+    - cron: '0 1 * * *'
+    - cron: '0 8 * * *'
     - cron: '0 16 * * *'
   workflow_dispatch:
 
 jobs:
-  push:
+  push-and-deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+
       - name: Install dependencies
         run: pip install openai requests
-      - name: Run push script
+
+      - name: Generate dashboard
         env:
           SF_API_KEY: ${{ secrets.SF_API_KEY }}
           SERVER_CHAN_KEY: ${{ secrets.SERVER_CHAN_KEY }}
         run: python push.py
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./output
+          force_orphan: true
