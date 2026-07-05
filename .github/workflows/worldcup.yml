@@ -28,7 +28,7 @@ jobs:
       - name: Generate dashboard
         env:
           SF_API_KEY: ${{ secrets.SF_API_KEY }}
-          SERVER_CHAN_KEY: ${{ secrets.SERVER_CHAN_KEY }}
+          RAPIDAPI_KEY: ${{ secrets.RAPIDAPI_KEY }}
         run: python push.py
 
       - name: Deploy to GitHub Pages
