@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Football Match Dashboard - 2026-07-11</title>
+    <style>
+        body {
+            background-color: #080B0F;
+            color: #FFFFFF;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            padding: 20px 0;
+        }
+        .header h1 {
+            color: #F0B429;
+            font-size: 36px;
+        }
+        .header p {
+            font-size: 18px;
+        }
+        .match-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+        .match-card {
+            background-color: #1A1C20;
+            border: 2px solid #F0B429;
+            border-radius: 10px;
+            padding: 20px;
+            width: 300px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .match-card h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        .match-card p {
+            font-size: 16px;
+            margin: 5px 0;
+        }
+        .match-card .data {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        .match-card .data .label {
+            font-weight: bold;
+        }
+        .match-card .data .value {
+            color: #F0B429;
+        }
+        .match-card .recommended-scores {
+            margin-top: 10px;
+        }
+        .match-card .recommended-scores h3 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+        .match-card .recommended-scores ul {
+            list-style: none;
+            padding: 0;
+        }
+        .match-card .recommended-scores ul li {
+            font-size: 16px;
+            margin: 5px 0;
+            color: #F0B429;
+        }
+        .match-card .upset-risk {
+            margin-top: 10px;
+            font-size: 16px;
+            color: #F0B429;
+        }
+        @media (max-width: 768px) {
+            .match-card {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Football Match Dashboard</h1>
+            <p>Date: 2026-07-11</p>
+        </div>
+        <div class="match-list">
+            <div class="match-card">
+                <h2>No Matches Today</h2>
+                <p>There are no scheduled matches for today, 2026-07-11.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+```
